@@ -1,0 +1,124 @@
+{% load staticfiles %} {% block content %} {% if form.errors %}
+<p>Your username and password didn't match. Please try again.</p>
+{% endif %}
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet" />
+    <link href="{% static 'font-awesome/css/font-awesome.css' %}" rel="stylesheet" />
+    <link href="{% static 'font-awesome-animation/dist/font-awesome-animation.css' %}" rel="stylesheet" />
+    <link href="{% static 'bootstrap-sweetalert/dist/sweetalert.css' %}" rel="stylesheet" />
+    <link rel="stylesheet" type="text/css" href="{% static 'css/normalize.css' %}" />
+    <link rel="shortcut icon" type="image/png" href="{% static 'images/favicon.ico' %}" />
+    <link href="{% static 'css/home.css' %}" rel="stylesheet" type="text/css">
+
+    <script src="{% static 'js/jquery.min.js' %}"></script>
+    <script src="{% static 'js/prefixfree.min.js' %}"></script>
+    <script src="{% static 'js/bootstrap.min.js' %}"></script>
+    <script src="{% static 'bootstrap-sweetalert/dist/sweetalert.js' %}"></script>
+    <script src="{% static 'bootstrap-sweetalert/dist/sweetalert.min.js' %}"></script>
+    <!-- <script src="{% static 'js/issueLogger.js' %}"></script> -->
+    <script src="{% static 'js/home.js' %}"></script>
+
+    <title>SIMS | portal</title>
+    {% if projectIDList %}
+    {% with "1" as name %}     
+    {% endwith %}
+    {% endif %}
+    <script type="text/javascript">
+    function startLoader() {
+        $("#faded").addClass("faded");
+        $("#animated-icon").addClass("animated-icon");
+        $("#loader").addClass("loader");
+    }
+
+    function stopLoader() {
+        $("#faded").removeClass("faded");
+        $("#animated-icon").removeClass("animated-icon");
+        $("#loader").removeClass("loader");
+    }
+
+  
+
+  
+    </script>
+</head>
+
+<body >
+    <!-- {% static 'images/background.jpg' %} -->
+    <!-- <div class="wrapper"> -->
+    
+
+   
+    <div id="message">
+           <div class="container">
+           
+           <h3 class="project-header">
+              Home | Analytics
+           </h3>
+               <div class="row">
+               {% if subjects %}
+               {% for subject in subjects %} 
+                       <div class="col-md-4 card view-analytics-subjectwise" name = "{{subject.0}}" id="{{subject.1}}" data-target="#myModal" data-toggle="modal">
+                           <div class="well" type="submit">
+                              <h4><i class="fa fa-book" aria-hidden="true"></i> {{subject.0}}</h4>
+                                   <p class="text-muted-color" >{{subject.1}}</p>
+                           </div>
+                       </div>
+                 {% endfor %}
+                {% endif %}
+
+               {% if semDetails %}
+               {% for semester in semDetails %} 
+                       <div class="col-md-4 card view-analytics-semwise" name = "{{semester.1}}" id="{{semester.0}}" data-target="#myModal" data-toggle="modal">
+                           <div class="well" type="submit">
+                             <h4><i class="fa fa-book " aria-hidden="true"></i> Semester {{semester.0}}</h4>
+                                   <p class="text-muted-color" >{{semester.1}}</p>
+                           </div>
+                       </div>
+                 {% endfor %}
+                {% endif %}
+                 
+           </div>
+       </div>
+    
+</div>
+
+
+<div id="issueDetailedInfo">
+    <div class="modal fade" id="your-modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+            <form action="">
+                <div class="modal-header" style="border-bottom: 2px solid #128f76;">
+                    
+                </div>
+                <div class="modal-body modal-lg">
+                    
+                </div>
+                <div class="modal-footer">
+                  <button type="button" id ="4" class="btn submit-button iamarks-modal">Update Marks</button>
+                  <a href="/downloadReport/"> <button type="button" id ="4" class="btn submit-button ">Download Reports</button> </a>
+
+                </form> 
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+    <!-- ############################################################################################################ -->
+    <!-- <div class="nav-side-menu"> -->
+    <div id="faded">
+        <div id="animated-icon">
+            <div id="loader"></div>
+        </div>
+    </div>
+</body>
+
+</html>
+{% endblock %}

@@ -1,0 +1,213 @@
+{% load static %} {% block content %}
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+ 
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap.min.css">
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datetimepicker/4.7.14/css/bootstrap-datetimepicker.min.css">
+  <link href="{% static 'bootstrap-sweetalert/dist/sweetalert.css' %}" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdn.datatables.net/1.10.11/css/jquery.dataTables.min.css">
+  <link href="{% static 'css/common.css' %}" rel="stylesheet" type="text/css">
+  <link rel="shortcut icon" type="image/png" href="{% static 'images/favicon.ico' %}" />
+  <script src="{% static 'js/jquery.min.js' %}"></script>
+  <script src="{% static 'js/jquery.toaster.js' %}"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.15.1/moment.min.js"></script> 
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datetimepicker/4.7.14/js/bootstrap-datetimepicker.min.js"></script>
+  <script src="https://cdn.datatables.net/1.10.11/js/jquery.dataTables.min.js"></script>
+  <script src="{% static 'bootstrap-sweetalert/dist/sweetalert.min.js' %}"></script>
+<script src="{% static 'js/request.js' %}"></script>
+  
+
+  <title>BreakGlass</title>
+    <script type="text/javascript">
+    function startLoader() {
+        $("#faded").addClass("faded");
+        $("#animated-icon").addClass("animated-icon");
+        $("#loader").addClass("loader");
+    }
+
+    function stopLoader() {
+        $("#faded").removeClass("faded");
+        $("#animated-icon").removeClass("animated-icon");
+        $("#loader").removeClass("loader");
+    }
+    
+    $(document).ready(function() {
+        $('#requestername').val('{{ request.session.current_username }}')
+        $('.enter-ia-button').each(function() {
+            $(this).click(function() {
+                var id = $(this).attr('id');
+                // console.log("ID" + id);
+                //Do whatever the edit function should do with the id
+
+                // startLoader();
+                event.preventDefault();
+                $.ajax({
+                    type: "POST",
+                    url: "/enteria/",
+                    data: {
+                        'project_id_1': id,
+                        'csrfmiddlewaretoken': '{{ csrf_token }}'
+                    },
+                    success: function(data) {
+                        // console.log(data);
+                        $('#message').hide();
+                        $("#taskboard").html(data);
+                    }
+                });
+
+            });
+        });
+    });
+
+    
+    $(function () {
+             $('#datetimepicker1').datetimepicker({
+                // format:'d.m.Y H:i' 2012-12-15 01:21:05
+                format:'YYYY-MM-DD HH:mm:ss',
+                minDate:new Date()
+              });
+             $('#datetimepicker2').datetimepicker({
+                useCurrent: true,
+                format:'YYYY-MM-DD HH:mm:ss',
+                minDate:new Date()
+              });
+             $("#datetimepicker1").on("dp.change", function (e) {
+                       $('#datetimepicker2').data("DateTimePicker").minDate(e.date);
+             });
+             $("#datetimepicker2").on("dp.change", function (e) {
+                   $('#datetimepicker1').data("DateTimePicker").maxDate(e.date);
+                   console.log('Selected end date')
+                   var datetimeStart = $("#datetimepicker1").data().date;
+                   var datetimeEnd= $("#datetimepicker2").data().date;
+                   var startTimeStamp = Date.parse(datetimeStart)
+                   var endTimeStamp = Date.parse(datetimeEnd)
+                   var resolution = endTimeStamp - startTimeStamp
+                   var resolutionTime = (parseFloat(resolution) / (60000*60) ) 
+                   resolutionTime = resolutionTime.toFixed(2);
+                   if(resolutionTime<8.01){
+                    console.log('Enabling button:'+resolutionTime)
+                    $('#requestsubmit').removeAttr('disabled');
+                    $('#warningtext').hide();
+                   }else{
+                    console.log('Disabling button:'+resolutionTime)
+                    $('#requestsubmit').prop('disabled',true);
+                    $('#warningtext').show();
+                   }
+                   console.log('Timestamp:'+resolutionTime)
+                   if(resolutionTime.includes('.00'))
+                        resolutionTime = resolutionTime.replace('.00','')
+                   $('#calculatedhours').val(resolutionTime+' Hours');
+                   $('.calculatedhourslabel').removeClass('hide');
+             });
+    })
+    </script>
+</head>
+
+<body style="overflow: hidden;"  >
+
+  
+
+     <div class="primary-header">
+       <!--  <div class="container"> -->
+       <div class="container-fluid">
+            <div class="row">
+                <div class="col-md-3">
+                    <a class="logo" href="/home/">
+                        <!-- <i class="navbar-brand fa fa-power-off logout" aria-hidden="true"></i> -->
+                        <img class="navbar-brand logo-display" style="height: 25px;" src="{% static 'images/banklogo.svg' %}" alt="LOGO">
+                    </a>
+                    </a>
+                </div >
+                <ul class="nav navbar-nav navbar-right nav-user" style="">
+                     <li><span class="fa fa-user"></span> {{ request.session.current_username }}</li>
+                </ul>
+
+            </div>
+        </div>
+    </div>
+   
+<div class="container">
+  <h2>Request</h2>
+  <form class="form-horizontal">
+    <div class="control-group form-group">
+       <div class="control-group form-inline">
+        <label class="inputKey" >Name</label>
+        <input class="requesterwidth form-control" type="text" id="requestername" placeholder="Name" readonly>
+       </div>
+   </div>
+  <div class="control-group form-group">
+    <!-- <label class="control-label" for="inputType">Role to access</label> -->
+    <div class="controls form-inline">
+    <label for="inputKey">Role to access</label>
+      <select class="requesterwidth form-control" id="role">
+       {% if roleList %} {% for role in roleList %}
+        <option value="{{role.0}}">{{role.1}}</option>
+       {% endfor %} {% endif %}
+     </select>
+    </div>
+</div> 
+
+
+  <div class="control-group form-group">
+    <span class="control-label"></span>
+    <div class="controls form-inline">
+        <label for="inputKey">Start time</label>
+      <div class='input-group date' id='datetimepicker1'>
+           <input data-format="yyyy-MM-dd hh:mm:ss" type='text' class="form-control" />
+           <span class="input-group-addon">
+           <span class="glyphicon glyphicon-calendar"></span>
+           </span>
+        </div>
+        <label class="endtime-label" for="inputValue">End time</label>
+      <div class='input-group date' id='datetimepicker2'>
+           <input data-format="yyyy-MM-dd hh:mm:ss" type='text' class="form-control" />
+           <span class="input-group-addon">
+           <span class="glyphicon glyphicon-calendar"></span>
+           </span>
+        </div>
+       
+    </div>
+  </div>
+
+  <div class="control-group form-group calculatedhourslabel hide">
+      <!-- <label class="control-label" for="inputType">Role to access</label> -->
+      <div class="controls form-inline">
+          <label for="inputKey">Selected</label>
+            <input class=" form-control" type="text" id="calculatedhours" placeholder="0" readonly>
+             <span id="warningtext" placeholder="0" >Please request less than 8 hours</span>
+      </div>
+      </div>
+
+<!-- <button type="submit" class="btn btn-primary btn-block w-50 ">Search</button> -->
+
+    <div class="mx-auto text-center">
+    <button type='button' id="requestsubmit" name="button" class="btn btn-primary btn-lg">Request</button>
+</div>
+</form>
+  
+</div>
+ 
+  <!-- </div> -->
+
+    <div id="taskboard">
+    </div>
+
+
+<!-- ################################################################################# -->
+
+    <div id="faded">
+        <div id="animated-icon">
+            <div id="loader"></div>
+        </div>
+    </div>
+     <footer class="navbar navbar-default navbar-fixed-bottom page-footer footer">
+        <p class="text-center">Copyrights © 2010 - 2021 All Rights Reserved by Bank of America
+    </footer>
+</body>
+
+</html>
+{% endblock %}
